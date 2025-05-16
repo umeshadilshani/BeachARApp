@@ -5,20 +5,32 @@
     <title>Beach AR App</title>
 
     <!-- A-Frame -->
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js "></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
     <!-- AR.js for A-Frame -->
-    <script src="https://cdn.jsdelivr.net/npm/ @ar-js-org/ar.js/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js/aframe/build/aframe-ar.min.js"></script>
 
     <style>
-      body, html {
+      body,
+      html {
         margin: 0;
         padding: 0;
         overflow: hidden;
       }
+      #startButton {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 9999;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
+    <button id="startButton">Start Sound</button>
+
     <a-scene
       embedded
       arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; autoEnterAR: true;"
@@ -30,53 +42,20 @@
       <!-- Directional Sunlight -->
       <a-entity light="type: directional; color: #FFF; intensity: 1" position="5 5 -5"></a-entity>
 
-      <!-- Ground Plane (Sand Texture) -->
-      <a-plane
-        id="ground"
-        position="0 0 0"
-        rotation="-90 0 0"
-        width="10"
-        height="10"
-        material="src: https://i.imgur.com/6UZdFQg.jpg ; repeat: '5 5'; metalness: 0.1; roughness: 0.9"
-      ></a-plane>
-
       <!-- Marker with ID -->
       <a-marker id="marker" preset="hiro">
-        <!-- Main Palm Tree -->
         <a-entity
-          gltf-model="palm_tree_model.glb "
-          scale="0.5 0.5 0.5"
+          gltf-model="palm_tree.glb"
+          scale="1 1 1"
           position="0 0 0"
-          animation-mixer
-        ></a-entity>
-
-        <!-- Additional Palm Trees Around -->
-        <a-entity
-          gltf-model="palm_tree_model.glb"
-          scale="0.4 0.4 0.4"
-          position="-1.5 0 0.5"
-          animation-mixer
-        ></a-entity>
-
-        <a-entity
-          gltf-model="palm_tree_model.glb"
-          scale="0.3 0.3 0.3"
-          position="1.5 0 0.5"
-          animation-mixer
-        ></a-entity>
-
-        <!-- Ocean Distant Plane -->
-        <a-plane
-          position="0 0.1 -2"
           rotation="0 0 0"
-          width="10"
-          height="2"
-          material="color: #1E90FF; opacity: 0.5; side: double"
-        ></a-plane>
+          animation-mixer
+        ></a-entity>
 
         <!-- Sound Effects -->
         <a-entity
-        sound="src: url(ocean-beach-waves-332383.mp3); autoplay: true; loop: true; volume: 0.5"
+          id="beachSound"
+          sound="src: url(ocean-beach-waves-332383.mp3); autoplay: false; loop: true; volume: 0.5"
         ></a-entity>
       </a-marker>
 
@@ -85,8 +64,17 @@
     </a-scene>
 
     <script>
-      const marker = document.querySelector('#marker');
+      const startButton = document.getElementById('startButton');
+      const soundEntity = document.getElementById('beachSound');
 
+      startButton.addEventListener('click', () => {
+        if (soundEntity && soundEntity.components.sound) {
+          soundEntity.components.sound.playSound();
+        }
+        startButton.style.display = 'none'; // hide button after start
+      });
+
+      const marker = document.querySelector('#marker');
       marker.addEventListener('markerFound', () => {
         console.log('🔍 Marker found!');
       });
